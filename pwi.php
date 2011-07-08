@@ -171,6 +171,10 @@ class PWI
 	 */	
 	public function getInternalMarks() {
 		if (isset($this->regno) && isset($this->pass)) {
+			
+			/**
+			 * Can be worked upon only when there is atleast one entry!
+			 */
 			$ch = $this->ch;
 			curl_setopt($ch, CURLOPT_URL, "http://webstream.sastra.edu/sastrapwi/resource/StudentDetailsResources.jsp?resourceid=22");
 			curl_setopt ($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
@@ -180,15 +184,47 @@ class PWI
 	}
 
 	/**
-	 * Fetch Credits.
+	 * Fetch Grades.
 	 */	
 	public function getGrades() {
 		if (isset($this->regno) && isset($this->pass)) {
+		
+			/**
+			 * Get the Grades from PWI
+			 */
 			$ch = $this->ch;
 			curl_setopt($ch, CURLOPT_URL, "http://webstream.sastra.edu/sastrapwi/resource/StudentDetailsResources.jsp?resourceid=21");
 			curl_setopt ($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
-			$details = curl_exec($ch);
-			echo $details;
+			$html = curl_exec($ch);
+			
+			/**
+			 * Parse the content.
+			 */			
+			phpQuery::newDocument($html);
+			pq('table tr:empty')->remove();
+			pq('tr:first')->remove();
+			pq('tr:first')->remove(); 
+
+			$rows = pq('table tr:not(.tablecontent03)');
+			$details = array();
+			foreach ($rows as $key => $row) {
+				$details[$key]['SEM'] = trim(pq($row)->find('td:eq(0)')->text());
+				$details[$key]['DATE'] = trim(pq($row)->find('td:eq(1)')->text());
+				$details[$key]['SUBCODE'] = trim(pq($row)->find('td:eq(2)')->text());
+				$details[$key]['SUBNAME'] = trim(pq($row)->find('td:eq(3)')->text());
+				$details[$key]['CREDIT'] = trim(pq($row)->find('td:eq(4)')->text());
+				$details[$key]['GRADE'] = trim(pq($row)->find('td:eq(5)')->text());
+			}
+			$rows = pq('table tr:(.tablecontent03)');
+			foreach ($rows as $row) {
+				$details['CGPA'] = trim(pq($row)->find('td:eq(1)')->text());
+			}
+
+			/**
+			 * Encode into JSON and return.
+			 */
+			return json_encode($details);
+			 
 		} else die("Register Number or Password not set.");
 	}
 	
