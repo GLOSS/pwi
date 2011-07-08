@@ -138,14 +138,14 @@ class PWI
 			$attendance = array();
 			foreach ($rows as $key => $row) {
 				if (pq($row)->find('td:eq(0)')->text() != ' TOTAL ') {
-				 	$attendance[$key]['SUBCODE'] = pq($row)->find('td:eq(0)')->text();
-				 	$attendance[$key]['SUBNAME'] = pq($row)->find('td:eq(1)')->text();
-				 	$attendance[$key]['TOTAL'] = pq($row)->find('td:eq(2)')->text();
-				 	$attendance[$key]['PRESENT'] = pq($row)->find('td:eq(3)')->text();
-				 	$attendance[$key]['ABSENT'] = pq($row)->find('td:eq(4)')->text();
-				 	$attendance[$key]['%'] = pq($row)->find('td:eq(5)')->text();
+				 	$attendance[$key]['SUBCODE'] = trim(pq($row)->find('td:eq(0)')->text());
+				 	$attendance[$key]['SUBNAME'] = trim(pq($row)->find('td:eq(1)')->text());
+				 	$attendance[$key]['TOTAL'] = trim(pq($row)->find('td:eq(2)')->text());
+				 	$attendance[$key]['PRESENT'] = trim(pq($row)->find('td:eq(3)')->text());
+				 	$attendance[$key]['ABSENT'] = trim(pq($row)->find('td:eq(4)')->text());
+				 	$attendance[$key]['%'] = trim(pq($row)->find('td:eq(5)')->text());
 				} else {
-					$attendance['%'] = pq($row)->find('td:eq(4)')->text();	
+					$attendance['%'] = trim(pq($row)->find('td:eq(4)')->text());	
 				}
 			}
 			
@@ -183,10 +183,10 @@ class PWI
 			$rows = pq('table tr');
 			$details = array();
 			foreach ($rows as $key => $row) {
-				$details[$key]['DATE'] = pq($row)->find('td:eq(1)')->text();
-			 	$details[$key]['SUBCODE'] = pq($row)->find('td:eq(2)')->text();
-			 	$details[$key]['SUBNAME'] = pq($row)->find('td:eq(3)')->text();
-			 	$details[$key]['HOUR'] = pq($row)->find('td:eq(4)')->text();
+				$details[$key]['DATE'] = trim(pq($row)->find('td:eq(1)')->text());
+			 	$details[$key]['SUBCODE'] = trim(pq($row)->find('td:eq(2)')->text());
+			 	$details[$key]['SUBNAME'] = trim(pq($row)->find('td:eq(3)')->text());
+			 	$details[$key]['HOUR'] = trim(pq($row)->find('td:eq(4)')->text());
 			}
 			
 			/**
