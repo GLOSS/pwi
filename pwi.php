@@ -81,6 +81,36 @@ class PWI
 	}
 	
 	/**
+	 * Fetch Name
+	 */
+	function getName(){
+		phpQuery::newDocument($this->home);
+		$list = pq('ul.leftnavlinks01');
+		$name =  trim(pq($list)->find('li:eq(0)')->text());		
+		return $name;
+	} 
+
+	/**
+	 * Fetch Group
+	 */
+	function getGroup(){
+		phpQuery::newDocument($this->home);
+		$list = pq('ul.leftnavlinks01');
+		$name =  trim(pq($list)->find('li:eq(1)')->text());		
+		return $name;
+	}
+
+	/**
+	 * Fetch Semester
+	 */
+	function getSemester(){
+		phpQuery::newDocument($this->home);
+		$list = pq('ul.leftnavlinks01');
+		$name =  trim(pq($list)->find('li:eq(3)')->text());		
+		return $name;
+	} 
+		
+	/**
 	 * Fetch Attendance.
 	 */
 	public function getAttendance() {
