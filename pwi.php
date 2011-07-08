@@ -258,6 +258,40 @@ class PWI
 		} else die("Register Number or Password not set.");
 	}
 	
+
+	/**
+	 * Fetch CGPA
+	 */	
+	public function getCGPA() {
+		if (isset($this->regno) && isset($this->pass)) {
+		
+			/**
+			 * Get the Grades Page from PWI
+			 */
+			$ch = $this->ch;
+			curl_setopt($ch, CURLOPT_URL, "http://webstream.sastra.edu/sastrapwi/resource/StudentDetailsResources.jsp?resourceid=21");
+			curl_setopt ($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
+			$html = curl_exec($ch);
+			
+			/**
+			 * Parse the content and only the cgpa.
+			 */			
+			phpQuery::newDocument($html);
+
+			$rows = pq('table tr:(.tablecontent03)');
+			foreach ($rows as $row) {
+				$cgpa = trim(pq($row)->find('td:eq(1)')->text());
+			}
+			
+			return $cgpa;
+			 
+		} else die("Register Number or Password not set.");
+	}
+	
+
+	/**
+	 * Fetch the Timetable.
+	 */
 	public function getTimeTable() {
 		if (isset($this->regno) && isset($this->pass)) {
 		
@@ -270,7 +304,7 @@ class PWI
 			$html = curl_exec($ch);
 
 			/**
-			 * Parse the timetable.
+			 * Parse and get the timetable.
 			 */	
 			phpQuery::newDocument($html);
 			pq('table[bgcolor="#eeeeee"]')->remove();
@@ -290,41 +324,177 @@ class PWI
 				
 				$week = pq($row)->find('td:eq(0)')->text();
 				
-				if (pq($row)->find('td:eq(1)')->text() != NULL)
-					$details[$week]['08:40-09:30'] = pq($row)->find('td:eq(1)')->text();
-				else $details[$week]['08:40-09:30'] = "FREE";
-				
-				if (pq($row)->find('td:eq(2)')->text() != NULL)
-					$details[$week]['09:30-10:20'] = pq($row)->find('td:eq(2)')->text();
-				else $details[$week]['09:30-10:20'] = "FREE";
-				
-				if (pq($row)->find('td:eq(3)')->text() != NULL)
-					$details[$week]['10:20-11:10'] = pq($row)->find('td:eq(3)')->text();
-				else $details[$week]['10:20-11:10'] = "FREE";
-				
-				if (pq($row)->find('td:eq(4)')->text() != NULL)
-					$details[$week]['11:30-12:20'] = pq($row)->find('td:eq(4)')->text();
-				else $details[$week]['11:30-12:20'] = "FREE";
-				
-				if (pq($row)->find('td:eq(5)')->text() != NULL)
-					$details[$week]['12:20-13:10'] = pq($row)->find('td:eq(5)')->text();
-				else $details[$week]['12:20-13:10'] = "FREE";
-				
-				if (pq($row)->find('td:eq(6)')->text() != NULL)
-					$details[$week]['13:10-14:00'] = pq($row)->find('td:eq(6)')->text();
-				else $details[$week]['13:10-14:00'] = "FREE";
-				
-				if (pq($row)->find('td:eq(7)')->text() != NULL)
-					$details[$week]['14:20-15:10'] = pq($row)->find('td:eq(7)')->text();
-				else $details[$week]['14:20-15:10'] = "FREE";
-				
-				if (pq($row)->find('td:eq(8)')->text() != NULL)
-					$details[$week]['15:10-16:00'] = pq($row)->find('td:eq(8)')->text();
-				else $details[$week]['15:10-16:00'] = "FREE";
-				
-				if (pq($row)->find('td:eq(9)')->text() != NULL)
-					$details[$week]['16:00-16:50'] = pq($row)->find('td:eq(9)')->text();
-				else $details[$week]['16:00-16:50'] = "FREE";
+				$temp = trim(pq($row)->find('td:eq(1)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["1"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["1"]["SUBNAME"] = "";
+						$details[$week]["1"]["SUBCODE2"] = "NIL";
+						$details[$week]["1"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["1"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["1"]["SUBNAME"] = "";
+						$details[$week]["1"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["1"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["1"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(2)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["2"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["2"]["SUBNAME"] = "";
+						$details[$week]["2"]["SUBCODE2"] = "NIL";
+						$details[$week]["2"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["2"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["2"]["SUBNAME"] = "";
+						$details[$week]["2"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["2"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["2"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(3)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["3"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["3"]["SUBNAME"] = "";
+						$details[$week]["3"]["SUBCODE2"] = "NIL";
+						$details[$week]["3"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["3"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["3"]["SUBNAME"] = "";
+						$details[$week]["3"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["3"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["3"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(4)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["4"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["4"]["SUBNAME"] = "";
+						$details[$week]["4"]["SUBCODE2"] = "NIL";
+						$details[$week]["4"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["4"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["4"]["SUBNAME"] = "";
+						$details[$week]["4"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["4"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["4"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(5)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["5"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["5"]["SUBNAME"] = "";
+						$details[$week]["5"]["SUBCODE2"] = "NIL";
+						$details[$week]["5"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["5"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["5"]["SUBNAME"] = "";
+						$details[$week]["5"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["5"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["5"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(6)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["6"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["6"]["SUBNAME"] = "";
+						$details[$week]["6"]["SUBCODE2"] = "NIL";
+						$details[$week]["6"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["6"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["6"]["SUBNAME"] = "";
+						$details[$week]["6"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["6"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["6"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(7)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["7"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["7"]["SUBNAME"] = "";
+						$details[$week]["7"]["SUBCODE2"] = "NIL";
+						$details[$week]["7"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["7"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["7"]["SUBNAME"] = "";
+						$details[$week]["7"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["7"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["7"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(8)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["8"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["8"]["SUBNAME"] = "";
+						$details[$week]["8"]["SUBCODE2"] = "NIL";
+						$details[$week]["8"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["8"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["8"]["SUBNAME"] = "";
+						$details[$week]["8"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["8"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["8"] = "FREE";
+
+				$temp = trim(pq($row)->find('td:eq(9)')->text());
+				if ($temp != NULL) {
+					if (strpos($temp, ",") === false) {
+						$temp = explode("-",$temp);
+						$details[$week]["9"]["SUBCODE"] = trim($temp[0]);
+						$details[$week]["9"]["SUBNAME"] = "";
+						$details[$week]["9"]["SUBCODE2"] = "NIL";
+						$details[$week]["9"]["SUBNAME2"] = "NIL";
+					} else {
+						$temp = explode(",",$temp);
+						$temp2 = explode("-",$temp[0]);
+						$temp3 = explode("-", $temp[1]);
+						$details[$week]["9"]["SUBCODE"] = trim($temp2[0]);
+						$details[$week]["9"]["SUBNAME"] = "";
+						$details[$week]["9"]["SUBCODE2"] = trim($temp3[0]);
+						$details[$week]["9"]["SUBNAME2"] = "";
+					}
+				} else $details[$week]["9"] = "FREE";
+
 			}
 			
 			/**
