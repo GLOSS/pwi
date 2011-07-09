@@ -2,7 +2,7 @@
 
 /**
  * An API for SASTRA's Parent Web Interface.
- * @author: Vignesh Rajagopalan <vignesh@campuspry.com>
+ * @author Vignesh Rajagopalan <vignesh@campuspry.com>
  *
  * A one day hack! (@date 07-07-2011)
  */
@@ -76,38 +76,21 @@ class PWI
 			curl_setopt($ch, CURLOPT_POSTFIELDS, "txtRegNumber=iamalsouser&txtPwd=thanksandregards&txtSN={$this->regno}&txtPD={$this->pass}&txtPA=1");
 			curl_setopt ($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/youLogin.jsp");
 			$this->home = curl_exec($ch);
-			//echo curl_error($ch).'<br /><br />'.$home;
 		} else die("Register Number or Password not set.");
 	}
 	
 	/**
-	 * Fetch Name
+	 * Fetch Student Info
 	 */
-	function getName(){
+	function getInfo(){
 		phpQuery::newDocument($this->home);
 		$list = pq('ul.leftnavlinks01');
-		$name =  trim(pq($list)->find('li:eq(0)')->text());		
-		return $name;
-	} 
-
-	/**
-	 * Fetch Group
-	 */
-	function getGroup(){
-		phpQuery::newDocument($this->home);
-		$list = pq('ul.leftnavlinks01');
-		$name =  trim(pq($list)->find('li:eq(1)')->text());		
-		return $name;
-	}
-
-	/**
-	 * Fetch Semester
-	 */
-	function getSemester(){
-		phpQuery::newDocument($this->home);
-		$list = pq('ul.leftnavlinks01');
-		$name =  trim(pq($list)->find('li:eq(3)')->text());		
-		return $name;
+		$details = array();
+		$details["REGNO"] = $this->regno;
+		$details["NAME"] =  trim(pq($list)->find('li:eq(0)')->text());
+		$details["GROUP"] =  trim(pq($list)->find('li:eq(1)')->text());
+		$details["SEM"] =  trim(pq($list)->find('li:eq(3)')->text());		
+		return json_encode($details);
 	} 
 		
 	/**
@@ -324,6 +307,8 @@ class PWI
 				
 				$week = pq($row)->find('td:eq(0)')->text();
 				
+				if($week == "Sat") break;
+				
 				$temp = trim(pq($row)->find('td:eq(1)')->text());
 				if ($temp != NULL) {
 					if (strpos($temp, ",") === false) {
@@ -504,6 +489,96 @@ class PWI
 			
 		} else die("Register Number or Password not set.");
 	}
+	
+	/**
+	 * Fetch Hostel Details.
+	 */
+	
+	function getHostelDetails() {
+		if (isset($this->regno) && isset($this->pass)) {
+		
+			/**
+			 * Get the Hostel Details from PWI.
+			 */
+			$ch = $this->ch;
+			curl_setopt($ch, CURLOPT_URL, "http://webstream.sastra.edu/sastrapwi/resource/StudentDetailsResources.jsp?resourceid=3");
+			curl_setopt ($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
+			$html = curl_exec($ch);
+			
+			/**
+			 * Parse the content to fetch the room name and number.
+			 */
+			phpQuery::newDocument($html);
+			pq('tr:first')->remove();
+			pq('tr:first')->remove(); 
+
+			$rows = pq('table tr');
+			$details = array();
+			foreach($rows as $row) {
+				$details["ROOMNAME"] = trim(pq($row)->find('td:eq(0)')->text());
+				$details["ROOMNO"] = trim(pq($row)->find('td:eq(1)')->text());
+			}
+
+			/**
+			 * Export as JSON.
+			 */
+			return json_encode($details);
+			
+		} else die("Register Number or Password not set.");		
+	}
+
+
+	/**
+	 * Fetch All or Part of the Courses.
+	 */
+	
+	function getCourses($sem = NULL) {
+		if (isset($this->regno) && isset($this->pass)) {
+		
+			/**
+			 * Get the Courses page from PWI.
+			 */
+			$ch = $this->ch;
+			curl_setopt($ch, CURLOPT_URL, "http://webstream.sastra.edu/sastrapwi/resource/StudentDetailsResources.jsp?resourceid=4");
+			curl_setopt ($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
+			$html = curl_exec($ch);
+			
+			/**
+			 * Parse the content to fetch the queried details.
+			 */
+			phpQuery::newDocument($html);
+			pq('tr:first')->remove();
+			pq('tr:first')->remove(); 
+
+			$rows = pq('table tr');
+			$details = array();
+			$key = 0;
+			foreach($rows as $row) {
+				if ($sem == NULL) {
+					$details[$key]["SUBCODE"] = trim(pq($row)->find('td:eq(0)')->text());
+					$details[$key]["SUBNAME"] = trim(pq($row)->find('td:eq(1)')->text());
+					$details[$key]["CREDIT"] = trim(pq($row)->find('td:eq(3)')->text());
+					$details[$key]["SEM"] = trim(pq($row)->find('td:eq(2)')->text());
+					$key++;
+				} else {
+					if (trim(pq($row)->find('td:eq(2)')->text()) != $sem) continue;
+					else {
+						$details[$key]["SUBCODE"] = trim(pq($row)->find('td:eq(0)')->text());
+						$details[$key]["SUBNAME"] = trim(pq($row)->find('td:eq(1)')->text());
+						$details[$key]["CREDIT"] = trim(pq($row)->find('td:eq(3)')->text());
+						$details[$key]["SEM"] = trim(pq($row)->find('td:eq(2)')->text());
+						$key++;
+					}
+				}
+			}
+			
+			/**
+			 * Export as JSON.
+			 */
+			return json_encode($details);
+			
+		} else die("Register Number or Password not set.");		
+	}	 
 }
 
 ?>
