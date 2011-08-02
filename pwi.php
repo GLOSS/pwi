@@ -96,6 +96,18 @@ class PWI
 	/**
 	 * Fetch Attendance.
 	 */
+
+
+        public function isLoggedIn() {
+                phpQuery::newDocument($this->home);
+                if (!trim(pq(pq("#masterdiv"))->text())) {
+                    return FALSE;
+                } else {
+                   return TRUE;
+                }
+        }
+
+
 	public function getAttendance() {
 		if (isset($this->regno) && isset($this->pass)) {
 		
