@@ -25,6 +25,7 @@ class PWI
 	protected $pass; //Password => Birthday(ddmmyyyy)
 	
 	private $isAuthenticated; // Parameter to find if the user has successfully been authenticated against the PWI
+	private $isMainCampus;	// Parameter to find if the user is from Main Campus or from SRC Kumbakonam
 	
 	/**
 	 * Initialize the API.
@@ -82,10 +83,13 @@ class PWI
 			$loginPage = $this->home;
 			
 			$matchCount = preg_match("/Login failed, Username and Password do not match/",$loginPage, $matches);
-	
 			// Change the auth mode for the user
 			if($matchCount > 0) $this->isAuthenticated = false;
 			else $this->isAuthenticated = true;
+			
+			$matchCount = preg_match("/SASTRA-Srinivasa Ramanujam Center/",$loginPage, $matches);
+			if($matchCount > 0) $this->isMainCampus = false;
+			else $this->isMainCampus = true;
 		} else die("Register Number or Password not set.");
 	}
 	
@@ -94,6 +98,13 @@ class PWI
 	 **/
 	public function getAuthStatus() {
 		return $this->isAuthenticated;
+	}
+	
+	/**
+	 *	Get which campus does the student belong. Well useful, as certain operations are not available for SRC campus students on PWI.
+	 **/
+	public function getIsMainCampus() {
+		return $this->isMainCampus;
 	}
 	
 	/**
