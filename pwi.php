@@ -12,11 +12,11 @@ require_once('phpQuery.php');
 class PWI
 {
 	/**
-	 * Pre-Alpha Release
-	 * @version 1.0
+	 * Pre-Alpha Release (Code Name: TimePass)
+	 * @version 1.1
 	 */
 	 
-	const VERSION = 1.0;
+	const VERSION = 1.1;
 
 	/**
 	 * The 2 Params!
@@ -24,7 +24,7 @@ class PWI
 	protected $regno; //Register Number of the Student.
 	protected $pass; //Password => Birthday(ddmmyyyy)
 	
-	protected $isAuthenticated; // Parameter to find if the user has successfully been authenticated against the PWI
+	private $isAuthenticated; // Parameter to find if the user has successfully been authenticated against the PWI
 	
 	/**
 	 * Initialize the API.
