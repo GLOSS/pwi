@@ -246,6 +246,15 @@ class PWI
 
 	/**
 	 * Fetch Grades.
+	 *
+	 *	Update	- The papers are grouped by Semester. 
+	 *	Usage	-
+	 *			$grades = json_decode($student->getGrades());
+	 *			// To get the semester 2 paper details
+	 *			foreach($grades[2] as $paper) {
+	 *				echo $paper->SUBNAME;	// Get the subject name
+	 *				echo $paper->GRADE;		// Get the grade in that paper
+	 *			}
 	 */	
 	public function getGrades() {
 		if (isset($this->regno) && isset($this->pass)) {
@@ -269,12 +278,19 @@ class PWI
 				$rows = pq('table tr:not(.tablecontent03)');
 				$details = array();
 				foreach ($rows as $key => $row) {
-					$details[$key]['SEM'] = trim(pq($row)->find('td:eq(0)')->text());
-					$details[$key]['DATE'] = trim(pq($row)->find('td:eq(1)')->text());
-					$details[$key]['SUBCODE'] = trim(pq($row)->find('td:eq(2)')->text());
-					$details[$key]['SUBNAME'] = trim(pq($row)->find('td:eq(3)')->text());
-					$details[$key]['CREDIT'] = trim(pq($row)->find('td:eq(4)')->text());
-					$details[$key]['GRADE'] = trim(pq($row)->find('td:eq(5)')->text());
+					// Storing the values by Semester for easy processing
+					$sem = trim(pq($row)->find('td:eq(0)')->text());
+					
+					$semDetails = array();
+					$semDetails['SEM'] = $sem;
+					$semDetails['DATE'] = preg_replace("/ \/ /"," ",trim(pq($row)->find('td:eq(1)')->text()));
+					$semDetails['SUBCODE'] = trim(pq($row)->find('td:eq(2)')->text());
+					$semDetails['SUBNAME'] = preg_replace("/&/","and",trim(pq($row)->find('td:eq(3)')->text()));
+					$semDetails['CREDIT'] = trim(pq($row)->find('td:eq(4)')->text());
+					$semDetails['GRADE'] = trim(pq($row)->find('td:eq(5)')->text());
+					
+					// Add them to the main details
+					$details[$sem][] = $semDetails;
 				}
 				$rows = pq('table tr:(.tablecontent03)');
 				foreach ($rows as $row) {
