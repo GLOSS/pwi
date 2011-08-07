@@ -282,7 +282,7 @@ class PWI
 					$sem = trim(pq($row)->find('td:eq(0)')->text());
 					
 					$semDetails = array();
-					$semDetails['SEM'] = $sem;
+					$semDetails['SEM'] = $sem;	// For historic reasons
 					$semDetails['DATE'] = preg_replace("/ \/ /"," ",trim(pq($row)->find('td:eq(1)')->text()));
 					$semDetails['SUBCODE'] = trim(pq($row)->find('td:eq(2)')->text());
 					$semDetails['SUBNAME'] = preg_replace("/&/","and",trim(pq($row)->find('td:eq(3)')->text()));
