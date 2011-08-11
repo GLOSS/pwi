@@ -32,7 +32,7 @@ class PWI
 	/**
 	 * Initialize the API.
 	 */
-	public function __construct($params) {
+	private function __construct($params) {
 		$this->isAuthenticated = false;
 		$this->setRegNo($params['regno']);
 		$this->setPass($params['pass']);
