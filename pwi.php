@@ -15,7 +15,7 @@ class PWI
 	 * Alpha Release
 	 * @version 1.1
 	 *
-	 * @contributor(s): Ashwanth Kumar <ashwanth.kumar@gmail.com>
+	 * @contributor(s): Ashwanth Kumar <ashwanth.kumar@gmail.com>, Adithya Parthasarathy <adithya91@gmail.com>
 	 */
 	 
 	const VERSION = 1.1;
@@ -43,12 +43,12 @@ class PWI
 	/**
 	 * Set the Params.
 	 */
-	private function setRegNo($regno){
+	private function setRegNo($regno) {
 		$this->regno = $regno;
 		return $this;
 	}
 	
-	private function setPass($pass){
+	private function setPass($pass) {
 		$this->pass = $pass;
 		return $this;
 	}
@@ -56,17 +56,18 @@ class PWI
 	/**
 	 * Set the required CURL Behaviour.
 	 */
-	private function setCurlBehaviour(){
+	private function setCurlBehaviour() {
 		$options = array(CURLOPT_POST => true,
-										 CURLOPT_FOLLOWLOCATION => true,
-										 CURLOPT_COOKIEJAR => "cookies.txt",
-										 CURLOPT_COOKIEFILE => "cookies.txt",
-										 CURLOPT_RETURNTRANSFER => true,
+				 CURLOPT_FOLLOWLOCATION => true,
+				 CURLOPT_COOKIEJAR => "cookies.txt",
+				 CURLOPT_COOKIEFILE => "cookies.txt",
+				 CURLOPT_RETURNTRANSFER => true,
                  		 CURLOPT_HEADER => false
                 	  );
-     $this->ch = curl_init();
-     curl_setopt_array($this->ch, $options);
-     return $this;
+
+		$this->ch = curl_init();
+		curl_setopt_array($this->ch, $options);
+     		return $this;
 	}
 
 	/**
@@ -94,22 +95,22 @@ class PWI
 	}
 	
 	/**
-	 *	Get the login status of the current user
-	 **/
+	 * Get the login status of the current user
+	 */
 	public function getAuthStatus() {
 		return $this->isAuthenticated;
 	}
 	
 	/**
-	 *	Get which campus does the student belong. Well useful, as certain operations are not available for SRC campus students on PWI.
-	 **/
+	 * Get which campus does the student belong. Well useful, as certain operations are not available for SRC campus students on PWI.
+	 */
 	public function getIsMainCampus() {
 		return $this->isMainCampus;
 	}
 	
 	/**
 	 * Throw error when user is not authenticated properly
-	 **/
+	 */
 	public function authError() {
 		return json_encode(array("status" => "false", "error" => "User not authenticated"));
 	}
@@ -138,6 +139,7 @@ class PWI
 	public function getAttendance() {
 		if (isset($this->regno) && isset($this->pass)) {
 			if($this->getAuthStatus()) {
+				
 				/**
 				 * Fetch the Attendance from PWI
 				 */
@@ -245,16 +247,7 @@ class PWI
 	}
 
 	/**
-	 * Fetch Grades.
-	 *
-	 *	Update	- The papers are grouped by Semester. 
-	 *	Usage	-
-	 *			$grades = json_decode($student->getGrades());
-	 *			// To get the semester 2 paper details
-	 *			foreach($grades[2] as $paper) {
-	 *				echo $paper->SUBNAME;	// Get the subject name
-	 *				echo $paper->GRADE;		// Get the grade in that paper
-	 *			}
+	 * Fetch Grades
 	 */	
 	public function getGrades() {
 		if (isset($this->regno) && isset($this->pass)) {
@@ -654,9 +647,14 @@ class PWI
 		} else die("Register Number or Password not set.");		
 	}
 
+	/**
+	 * Get Fee Dues
+	 */
+
         public function getFeeDue() {
         if (isset($this->regno) && isset($this->pass)) {
             if ($this->getAuthStatus()) {
+
                 /**
                  * Get the Fee Due details from PWI.
                  */
@@ -665,7 +663,10 @@ class PWI
                 curl_setopt($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
                 $html = curl_exec($ch);
 
-                phpQuery::newDocument($html);
+                /**
+		 * Parse the content
+		 */
+		phpQuery::newDocument($html);
                 pq('tr:first')->remove();
                 pq('tr:first')->remove();                
 
@@ -687,10 +688,6 @@ class PWI
             } else {
                 return $this->authError();
             }
-        } else
-            die("Register Number or Password not set.");
+        } else die("Register Number or Password not set.");
     }
-
 }
-
-?>
