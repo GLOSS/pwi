@@ -653,6 +653,44 @@ class PWI
 			}
 		} else die("Register Number or Password not set.");		
 	}
+
+        public function getFeeDue() {
+        if (isset($this->regno) && isset($this->pass)) {
+            if ($this->getAuthStatus()) {
+                /**
+                 * Get the Fee Due details from PWI.
+                 */
+                $ch = $this->ch;
+                curl_setopt($ch, CURLOPT_URL, "http://webstream.sastra.edu/sastrapwi/resource/StudentDetailsResources.jsp?resourceid=20");
+                curl_setopt($ch, CURLOPT_REFERER, "http://webstream.sastra.edu/sastrapwi/usermanager/home.jsp");
+                $html = curl_exec($ch);
+
+                phpQuery::newDocument($html);
+                pq('tr:first')->remove();
+                pq('tr:first')->remove();                
+
+                $rows = pq('table tr');
+                $details = array();
+                $key = 0;
+                foreach ($rows as $row) {
+                    $details[$key]["SEM"] = trim(pq($row)->find('td:eq(0)')->text());
+                    $details[$key]["INSTITUTION"] = trim(pq($row)->find('td:eq(1)')->text());
+                    $details[$key]["PARTICULARS"] = trim(pq($row)->find('td:eq(2)')->text());
+                    $details[$key]["DUEAMOUNT"] = trim(pq($row)->find('td:eq(3)')->text());
+                    $details[$key]["DUEDATE"] = trim(pq($row)->find('td:eq(4)')->text());
+                    $key++;
+                }
+                /**
+                 * Export as JSON.
+                 */
+                return json_encode($details);
+            } else {
+                return $this->authError();
+            }
+        } else
+            die("Register Number or Password not set.");
+    }
+
 }
 
 ?>
