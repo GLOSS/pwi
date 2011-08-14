@@ -1,6 +1,6 @@
 {PWI}
 =====
-A fast and a lightweight php-sdk for SASTRA's Parent Web Interface (http://webstream.sastra.edu). This is a work in it's pre-alpha stage. Looking for developers to contribute.
+A fast and a lightweight php-sdk for SASTRA's Parent Web Interface (http://webstream.sastra.edu/sastrapwi/).
 
 Synopsis
 --------
@@ -51,4 +51,4 @@ Note on Patches/Pull Requests
 Copyright
 ---------
 Copyright (c) 2011 {PWI}, Vignesh Rajagopalan.
-See [LICENSE](http://aarvay.in/pwi/LICENSE) for details..
+See [LICENSE](http://aarvay.in/pwi/LICENSE) for details.
